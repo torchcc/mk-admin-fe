@@ -1,5 +1,4 @@
-# qm-plus-vue-page
-
+## MK Admin Frontend
 ## Project setup
 ```
 npm install
