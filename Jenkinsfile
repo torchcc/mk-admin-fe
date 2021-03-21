@@ -46,7 +46,7 @@ pipeline {
                 echo 'Preparing Env...'
                 // need to install workspace plugin
                 cleanWs()
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'troy-ssh-private-tx', url: 'git@github.com:Torchcc/mk-admin-fe.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'troy-202103-private-key', url: 'git@github.com:Torchcc/mk-admin-fe.git']]])
                 echo "checkout to path ${env.WORKSPACE}"
             }
         }
