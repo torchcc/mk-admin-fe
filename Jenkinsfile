@@ -13,7 +13,7 @@ def build(branch) {
     echo '****************************** vue start... ******************************'
     echo 'going to build branch ' + branch
     sh '''if [ -d /home/ubuntu/docker_data/nginx/data/html/admin/dist ]; then
-            if [-d /home/ubuntu/docker_data/nginx/data/html/admin/last_dist]; then
+            if [ -d /home/ubuntu/docker_data/nginx/data/html/admin/last_dist ]; then
                 rm -r /home/ubuntu/docker_data/nginx/data/html/admin/last_dist
             fi
             mv /home/ubuntu/docker_data/nginx/data/html/admin/dist /home/ubuntu/docker_data/nginx/data/html/admin/last_dist
