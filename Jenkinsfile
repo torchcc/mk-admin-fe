@@ -1,0 +1,69 @@
+#!/usr/bin/env groovy
+// Declarative //
+
+def getLatestVersion(branch) {
+    if (branch == 'release') {
+        return 'RELEASE-LATEST'
+    } else {
+        return 'SNAPSHOT'
+    }
+}
+
+def build(branch) {
+    echo '****************************** vue start... ******************************'
+    echo 'going to build branch ' + branch
+    sh '''if [ -d /home/ubuntu/docker_data/nginx/data/html/admin/dist ]; then
+            if [-d /home/ubuntu/docker_data/nginx/data/html/admin/last_dist]; then
+                rm -r /home/ubuntu/docker_data/nginx/data/html/admin/last_dist
+            fi
+            mv /home/ubuntu/docker_data/nginx/data/html/admin/dist /home/ubuntu/docker_data/nginx/data/html/admin/last_dist
+        fi'''
+    sh '''if [ ! -d node_modules ]; then
+            npm install
+        fi'''
+//     sh "npm rebuild node-sass"
+    sh "npm run build"
+    sh "mv ./dist /home/ubuntu/docker_data/nginx/data/html/admin/dist"
+}
+
+pipeline {
+    agent any
+
+    environment {
+        scmVars = null
+    }
+    tools {
+       nodejs 'nodejs-15'
+    }
+
+    triggers {
+        githubPush()
+    }
+
+    stages {
+        stage('Prepare Env') {
+            steps {
+                echo 'Preparing Env...'
+                // need to install workspace plugin
+//                 cleanWs()
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Troy-personal-git-private', url: 'git@github.com:Torchcc/mk-admin-fe.git']]])
+                echo "checkout to path ${env.WORKSPACE}"
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                build('master')
+            }
+        }
+    }
+    post {
+        always {
+            emailext(
+                subject: '构建通知：${PROJECT_NAME} - Build # ${BUILD_NUMBER} -${BUILD_STATUS}!',
+                body: '${FILE,path="email.html"}',
+                to: 'troymm@163.com'
+            )
+        }
+    }
+}
